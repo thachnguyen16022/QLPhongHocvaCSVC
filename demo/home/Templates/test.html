@@ -1,0 +1,38 @@
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    // Khởi tạo DataTable và thiết lập các tùy chọn
+    var dataTable = $('#example2').DataTable({
+      "order": [], // Không sắp xếp mặc định
+    });
+
+    // Thêm ô input tìm kiếm cho mỗi cột
+    $('#example2 thead tr').clone(true).appendTo('#example2 thead');
+    $('#example2 thead tr:eq(1) th').each(function(i) {
+      var title = $(this).text();
+      $(this).html('<input type="text" placeholder="Tìm ' + title + '" />');
+
+      // Xử lý sự kiện input
+      $('input', this).on('keyup change', function() {
+        if (dataTable.column(i).search() !== this.value) {
+            dataTable
+            .column(i)
+            .search(this.value)
+            .draw();
+        }
+      });
+    });
+
+    // Custom filter để tìm kiếm ngày lớn hơn {{ phong.tg_bd }}
+    $.fn.dataTable.ext.search.push(
+      function(settings, data, dataIndex) {
+        var minDate = new Date("{{ phong.tg_bd }}");
+        var currentDate = new Date(data[3]); // Index 3 là cột chứa ngày bắt đầu
+
+        return currentDate > minDate;
+      }
+    );
+  });
+</script>
